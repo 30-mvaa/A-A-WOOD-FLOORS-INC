@@ -1,0 +1,10 @@
+# Redirect rules for clean URLs and canonical enforcement
+
+# Redirect old /home to /
+/home    /    301
+
+# Clean index.html redirects
+/index.html    /    301
+
+# 404 fallback
+/*    /404.html    404

@@ -1,0 +1,23 @@
+{
+  "name": "A&A Wood Flooring, Inc.",
+  "short_name": "A&A Wood Floors",
+  "description": "Premier hardwood flooring, herringbone patterns, dustless sanding, and luxury vinyl plank across NY, NJ, and CT.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0b0d",
+  "theme_color": "#e11d2e",
+  "icons": [
+    {
+      "src": "/assets/beaver.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/beaver.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ]
+}

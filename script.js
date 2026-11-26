@@ -1,16 +1,45 @@
 /**
- * A&A Wood Floors - Main Script
+ * A&A Wood Flooring, Inc. | USA
+ * Production-Ready JavaScript Engine
+ * 
  * Features:
- * - Real-time Estimator Calculator & Form Synch
- * - Project Filter by Category
- * - Mobile Drawer Navigation
- * - Bilingual Support (English / Spanish)
- * - Lead Capture (Email & Direct WhatsApp)
+ * 1. Estimator Calculator with preliminary disclaimer & form synchronization
+ * 2. Form submission via FormSubmit AJAX with validation, anti-spam, and graceful fallback
+ * 3. Direct WhatsApp messaging with complete customer lead parameters
+ * 4. FAQ Accordion with accessible ARIA state management
+ * 5. Project Portfolio Filtering with smooth micro-transitions
+ * 6. Mobile Drawer Navigation & Backdrop Control
+ * 7. Google Analytics 4 (GA4) Event Dispatcher
  */
 
 document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+
   // ========================================================================
-  // 1. Cost Estimator Calculator
+  // GA4 Event Tracking Helper (Safe execution without throwing errors)
+  // ========================================================================
+  function trackEvent(eventName, eventParams) {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', eventName, eventParams || {});
+    }
+  }
+
+  // Track phone clicks
+  document.querySelectorAll('a[href^="tel:"]').forEach(function (link) {
+    link.addEventListener('click', function () {
+      trackEvent('click_phone', { phone_number: link.getAttribute('href') });
+    });
+  });
+
+  // Track email clicks
+  document.querySelectorAll('a[href^="mailto:"]').forEach(function (link) {
+    link.addEventListener('click', function () {
+      trackEvent('click_email', { email_address: link.getAttribute('href') });
+    });
+  });
+
+  // ========================================================================
+  // 1. Cost Estimator Calculator & Form Synchronization
   // ========================================================================
   const rng = document.getElementById('rng');
   const sfNum = document.getElementById('sf-num');
@@ -34,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const sqft = Number(rng.value) || 0;
 
     if (sfDisplay) sfDisplay.textContent = sqft.toLocaleString('en-US');
-    if (sfNum && sfNum.value != sqft) sfNum.value = sqft;
+    if (sfNum && Number(sfNum.value) !== sqft) sfNum.value = sqft;
 
     const minTotal = priceRates[0] * sqft;
     const maxTotal = priceRates[1] * sqft;
@@ -44,8 +73,14 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   if (rng && svc) {
-    rng.addEventListener('input', calculateEstimate);
-    svc.addEventListener('change', calculateEstimate);
+    rng.addEventListener('input', function () {
+      calculateEstimate();
+      trackEvent('use_estimator', { action: 'slider_change', sqft: rng.value });
+    });
+    svc.addEventListener('change', function () {
+      calculateEstimate();
+      trackEvent('use_estimator', { action: 'service_change', service: getSelectedServiceName() });
+    });
   }
 
   if (sfNum) {
@@ -64,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (rng) rng.value = val;
       if (sfNum) sfNum.value = val;
       calculateEstimate();
+      trackEvent('use_estimator', { action: 'preset_click', sqft: val });
     });
   });
 
@@ -81,18 +117,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
       if (areaInput) areaInput.value = sqft;
       if (notesTextarea) {
-        notesTextarea.value = `[Estimator Selection] Service: ${svcName} | Size: ${sqft} sq ft | Estimated range: ${priceText}\n` + notesTextarea.value;
+        const estSummary = `[Preliminary Estimate] Selected Service: ${svcName} | Size: ${sqft} sq ft | Projected Investment: ${priceText}\n`;
+        if (!notesTextarea.value.includes('[Preliminary Estimate]')) {
+          notesTextarea.value = estSummary + notesTextarea.value;
+        }
       }
 
       if (formEl) {
         formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         formEl.classList.add('highlighted');
-        setTimeout(() => formEl.classList.remove('highlighted'), 2400);
+        setTimeout(function () {
+          formEl.classList.remove('highlighted');
+        }, 2500);
       }
+
+      trackEvent('use_estimator', { action: 'lock_estimate', sqft: sqft, service: svcName });
     });
   }
 
-  // Initial calculation
+  // Run initial calculation
   calculateEstimate();
 
   // ========================================================================
@@ -103,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   filterButtons.forEach(function (btn) {
     btn.addEventListener('click', function () {
-      filterButtons.forEach(b => b.classList.remove('on'));
+      filterButtons.forEach(function (b) { b.classList.remove('on'); });
       btn.classList.add('on');
 
       const filterCat = btn.dataset.f;
@@ -113,16 +156,18 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!filterCat || cardCat === filterCat) {
           card.style.display = '';
           card.style.opacity = '0';
-          card.style.transform = 'translateY(10px)';
-          setTimeout(() => {
-            card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          card.style.transform = 'translateY(8px)';
+          setTimeout(function () {
+            card.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
             card.style.opacity = '1';
             card.style.transform = 'translateY(0)';
-          }, 30);
+          }, 20);
         } else {
           card.style.display = 'none';
         }
       });
+
+      trackEvent('filter_projects', { category: filterCat || 'all' });
     });
   });
 
@@ -139,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const isOpen = nav.classList.toggle('open');
     if (navToggle) {
       navToggle.classList.toggle('open', isOpen);
-      navToggle.setAttribute('aria-expanded', isOpen);
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     }
     if (navBackdrop) {
       navBackdrop.classList.toggle('active', isOpen);
@@ -161,17 +206,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (navToggle) navToggle.addEventListener('click', toggleMobileNav);
   if (navBackdrop) navBackdrop.addEventListener('click', closeMobileNav);
-  navLinks.forEach(link => link.addEventListener('click', closeMobileNav));
+  navLinks.forEach(function (link) {
+    link.addEventListener('click', closeMobileNav);
+  });
 
   // ========================================================================
-  // 4. Contact Form Handling & Direct WhatsApp Integration
+  // 4. FAQ Accordion Interaction
+  // ========================================================================
+  const faqQuestions = document.querySelectorAll('.faq-question');
+
+  faqQuestions.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const item = btn.closest('.faq-item');
+      if (!item) return;
+
+      const isOpen = item.classList.contains('open');
+
+      // Optional: Collapse siblings for clean accordion
+      document.querySelectorAll('.faq-item').forEach(function (otherItem) {
+        if (otherItem !== item) {
+          otherItem.classList.remove('open');
+          const otherBtn = otherItem.querySelector('.faq-question');
+          if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      item.classList.toggle('open', !isOpen);
+      btn.setAttribute('aria-expanded', (!isOpen).toString());
+
+      if (!isOpen) {
+        trackEvent('view_faq', { question: btn.textContent.trim() });
+      }
+    });
+  });
+
+  // ========================================================================
+  // 5. Contact Form Handling (FormSubmit AJAX + Fallback)
   // ========================================================================
   const contactForm = document.getElementById('f');
   const whatsappBtn = document.getElementById('btn-whatsapp');
   const formFeedback = document.getElementById('form-feedback');
+  const submitBtn = document.getElementById('btn-submit');
 
   function getFormData() {
-    const getVal = id => {
+    const getVal = function (id) {
       const el = document.getElementById(id);
       return el ? el.value.trim() : '';
     };
@@ -183,7 +261,8 @@ document.addEventListener('DOMContentLoaded', function () {
       email: getVal('em'),
       location: getVal('lc'),
       area: getVal('ar'),
-      notes: getVal('nt')
+      notes: getVal('nt'),
+      honey: getVal('hp_field') // Honeypot anti-spam
     };
   }
 
@@ -192,149 +271,121 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault();
       const d = getFormData();
 
-      if (!d.name || !d.phone || !d.location) {
-        alert('Please fill out all required fields marked with * (Name, Phone, Location).');
+      // Bot spam check
+      if (d.honey && d.honey.length > 0) {
+        console.warn('Spam detected via honeypot.');
         return;
       }
 
-      // Display positive confirmation feedback banner
-      if (formFeedback) {
-        formFeedback.classList.add('show');
-        formFeedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // Basic client-side validation
+      if (!d.name || !d.phone || !d.location) {
+        alert('Please fill out all required fields: Name, Phone Number, and Project Location.');
+        return;
       }
 
-      // Construct clean mailto URI
-      const subject = `Free Estimate Request - ${d.name} (${d.location})`;
-      const body =
-        `A&A Wood Floors Estimate Request:\n\n` +
-        `• Name: ${d.name}\n` +
-        `• Phone: ${d.phone}\n` +
-        `• Email: ${d.email || 'Not provided'}\n` +
-        `• Property Type: ${d.property}\n` +
-        `• Location: ${d.location}\n` +
-        `• Approx Area: ${d.area ? d.area + ' sq ft' : 'Not specified'}\n\n` +
-        `• Project Notes / Estimator Details:\n${d.notes || 'None'}\n`;
+      // Enter loading state
+      if (submitBtn) {
+        submitBtn.classList.add('is-loading');
+        submitBtn.disabled = true;
+      }
 
-      const mailtoUrl = `mailto:aawoodflooring22@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      setTimeout(() => {
-        window.location.href = mailtoUrl;
-      }, 400);
+      // Prepare payload for FormSubmit AJAX endpoint
+      const payload = {
+        name: d.name,
+        phone: d.phone,
+        email: d.email || 'Not provided',
+        property_type: d.property,
+        location: d.location,
+        square_footage: d.area ? d.area + ' sq ft' : 'Not specified',
+        notes: d.notes || 'None',
+        _subject: `New Free Estimate Request - ${d.name} (${d.location})`,
+        _template: 'table'
+      };
+
+      // Send to FormSubmit endpoint asynchronously
+      fetch('https://formsubmit.co/ajax/aawoodflooring22@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        if (submitBtn) {
+          submitBtn.classList.remove('is-loading');
+          submitBtn.disabled = false;
+        }
+
+        if (formFeedback) {
+          formFeedback.classList.remove('error');
+          formFeedback.classList.add('show');
+          formFeedback.innerHTML = `✅ <b>Thank you, ${d.name}!</b> Your estimate request has been received.<br>An estimator will review your details and call you at <b>${d.phone}</b> to schedule your complimentary visit.`;
+          formFeedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        trackEvent('generate_lead', {
+          method: 'formsubmit_ajax',
+          location: d.location,
+          service: d.property
+        });
+
+        contactForm.reset();
+        calculateEstimate();
+      })
+      .catch(function (error) {
+        console.error('Form submission network error:', error);
+        if (submitBtn) {
+          submitBtn.classList.remove('is-loading');
+          submitBtn.disabled = false;
+        }
+
+        // Graceful fallback to mailto
+        if (formFeedback) {
+          formFeedback.classList.add('show', 'error');
+          formFeedback.innerHTML = `⚠️ <b>Note:</b> Submission could not reach server. Opening email draft as backup, or contact us directly at <a href="tel:+19179304105"><b>(917) 930-4105</b></a> or via WhatsApp.`;
+        }
+
+        const subject = `Free Estimate Request - ${d.name} (${d.location})`;
+        const body =
+          `A&A Wood Floors Estimate Request:\n\n` +
+          `• Name: ${d.name}\n` +
+          `• Phone: ${d.phone}\n` +
+          `• Email: ${d.email}\n` +
+          `• Location: ${d.location}\n` +
+          `• Property Type: ${d.property}\n` +
+          `• Approx Area: ${d.area} sq ft\n\n` +
+          `• Project Details:\n${d.notes}\n`;
+
+        window.location.href = `mailto:aawoodflooring22@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      });
     });
   }
 
+  // ========================================================================
+  // 6. Direct WhatsApp Lead Submission
+  // ========================================================================
   if (whatsappBtn) {
     whatsappBtn.addEventListener('click', function () {
       const d = getFormData();
       const text =
-        `Hello A&A Wood Floors! I'd like to request a free estimate:\n\n` +
-        `*Name:* ${d.name || '[My Name]'}\n` +
-        `*Phone:* ${d.phone || '[My Phone]'}\n` +
-        `*Location:* ${d.location || '[City / ZIP]'}\n` +
-        `*Area:* ${d.area ? d.area + ' sq ft' : 'To be measured'}\n` +
-        `*Property:* ${d.property || 'Residential'}\n` +
-        (d.notes ? `*Notes:* ${d.notes}` : '');
+        `Hello A&A Wood Floors! I would like to request a free on-site estimate:\n\n` +
+        `• Name: ${d.name || '[My Name]'}\n` +
+        `• Phone: ${d.phone || '[My Phone]'}\n` +
+        `• Location: ${d.location || '[City / ZIP]'}\n` +
+        `• Property: ${d.property || 'Residential'}\n` +
+        `• Approx Area: ${d.area ? d.area + ' sq ft' : 'To be measured'}\n` +
+        (d.notes ? `• Details: ${d.notes}\n` : '');
 
       const waUrl = `https://wa.me/19179304105?text=${encodeURIComponent(text)}`;
+      trackEvent('click_whatsapp', {
+        action: 'send_quote_whatsapp',
+        has_details: Boolean(d.name)
+      });
       window.open(waUrl, '_blank', 'noopener,noreferrer');
     });
-  }
-
-  // ========================================================================
-  // 5. Bilingual Support (English / Spanish)
-  // ========================================================================
-  const i18n = {
-    en: {
-      topBanner: '🚀 Now booking spring installs across NY • NJ • CT.',
-      topQuoteLink: 'Get your free quote →',
-      navHome: 'Home',
-      navServices: 'Services',
-      navHow: 'How It Works',
-      navCredentials: 'Credentials',
-      navEstimator: 'Estimator',
-      navProjects: 'Projects',
-      navTestimonials: 'Testimonials',
-      navAbout: 'About',
-      navContact: 'Contact',
-      navQuoteBtn: 'Free Quote',
-      heroTag: 'QUALITY • DESIGN • DURABILITY',
-      heroTitle: 'HARDWOOD FLOORING, <span>HERRINGBONE</span> & DUSTLESS SANDING',
-      heroDesc: 'We’re the most trusted flooring crew in the Tri-State area: licensed, insured, and 10+ years of craftsmanship.',
-      heroCtaQuote: 'Get a Free Quote',
-      heroCtaServices: 'Our Services',
-      heroCtaCall: 'Call (917) 930-4105',
-      estTitle: 'Estimate your investment in seconds',
-      estDesc: 'Real-time projection based on current Tri-State materials and labor. Final quote confirmed on-site.',
-      estLockBtn: 'Lock In This Free Estimate',
-      projTitle: 'Our work. Your inspiration.',
-      filterAll: 'All Projects',
-      filterHerringbone: 'Herringbone',
-      filterHardwood: 'Hardwood',
-      filterSanding: 'Dustless Sanding',
-      filterLvp: 'Vinyl Plank',
-      filterRepairs: 'Repairs',
-      formTitle: 'Request a free on-site estimate',
-      formSubmitBtn: 'Request Free Estimate ✉️',
-      formWhatsAppBtn: 'Send via WhatsApp 💬'
-    },
-    es: {
-      topBanner: '🚀 Agendando instalaciones de primavera en NY • NJ • CT.',
-      topQuoteLink: 'Cotiza gratis aquí →',
-      navHome: 'Inicio',
-      navServices: 'Servicios',
-      navHow: 'Cómo Funciona',
-      navCredentials: 'Credenciales',
-      navEstimator: 'Calculadora',
-      navProjects: 'Proyectos',
-      navTestimonials: 'Testimonios',
-      navAbout: 'Nosotros',
-      navContact: 'Contacto',
-      navQuoteBtn: 'Cotizar Gratis',
-      heroTag: 'CALIDAD • DISEÑO • DURABILIDAD',
-      heroTitle: 'PISOS DE MADERA, <span>HERRINGBONE</span> Y LIJADO SIN POLVO',
-      heroDesc: 'El equipo de pisos más confiable en NY, NJ y CT: con licencia, asegurados y más de 10 años de experiencia artesanal.',
-      heroCtaQuote: 'Cotización Gratis',
-      heroCtaServices: 'Nuestros Servicios',
-      heroCtaCall: 'Llamar (917) 930-4105',
-      estTitle: 'Calcula tu inversión en segundos',
-      estDesc: 'Estimación en tiempo real según costos de materiales y mano de obra. Cotización final confirmada en tu domicilio.',
-      estLockBtn: 'Fijar Esta Cotización Gratuita',
-      projTitle: 'Nuestros proyectos. Tu inspiración.',
-      filterAll: 'Todos los Proyectos',
-      filterHerringbone: 'Herringbone',
-      filterHardwood: 'Madera Maciza',
-      filterSanding: 'Lijado sin Polvo',
-      filterLvp: 'Vinil Impermeable',
-      filterRepairs: 'Reparaciones',
-      formTitle: 'Solicita una visita técnica gratuita',
-      formSubmitBtn: 'Solicitar Cotización ✉️',
-      formWhatsAppBtn: 'Enviar por WhatsApp 💬'
-    }
-  };
-
-  const btnEn = document.getElementById('btn-en');
-  const btnEs = document.getElementById('btn-es');
-
-  function setLanguage(lang) {
-    if (!i18n[lang]) return;
-    localStorage.setItem('aa_wood_lang', lang);
-
-    if (btnEn) btnEn.classList.toggle('active', lang === 'en');
-    if (btnEs) btnEs.classList.toggle('active', lang === 'es');
-
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (i18n[lang][key]) {
-        el.innerHTML = i18n[lang][key];
-      }
-    });
-  }
-
-  if (btnEn) btnEn.addEventListener('click', () => setLanguage('en'));
-  if (btnEs) btnEs.addEventListener('click', () => setLanguage('es'));
-
-  // Restore saved language or default to en
-  const savedLang = localStorage.getItem('aa_wood_lang') || 'en';
-  if (savedLang === 'es') {
-    setLanguage('es');
   }
 });

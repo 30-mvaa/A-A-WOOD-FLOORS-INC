@@ -1,0 +1,14 @@
+# Robots.txt for A&A Wood Flooring, Inc.
+# Website: https://aawoodfloorsinc.com
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# XML Sitemap Location
+Sitemap: https://aawoodfloorsinc.com/sitemap.xml

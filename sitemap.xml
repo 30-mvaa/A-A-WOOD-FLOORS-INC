@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Primary Homepage (American English) -->
+  <url>
+    <loc>https://aawoodfloorsinc.com/</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://aawoodfloorsinc.com/" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aawoodfloorsinc.com/es/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aawoodfloorsinc.com/" />
+    <image:image>
+      <image:loc>https://aawoodfloorsinc.com/assets/project-herringbone.jpg</image:loc>
+      <image:title>Custom Herringbone Wood Flooring by A&amp;A Wood Flooring</image:title>
+      <image:caption>Artisan white oak herringbone installation with precision border inlays</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Spanish Homepage -->
+  <url>
+    <loc>https://aawoodfloorsinc.com/es/</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://aawoodfloorsinc.com/" />
+    <xhtml:link rel="alternate" hreflang="es-US" href="https://aawoodfloorsinc.com/es/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aawoodfloorsinc.com/" />
+  </url>
+
+  <!-- Service Locations Hub -->
+  <url>
+    <loc>https://aawoodfloorsinc.com/locations/</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://aawoodfloorsinc.com/locations/" />
+  </url>
+
+  <!-- New York Service Area -->
+  <url>
+    <loc>https://aawoodfloorsinc.com/locations/new-york/</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://aawoodfloorsinc.com/locations/new-york/" />
+    <image:image>
+      <image:loc>https://aawoodfloorsinc.com/assets/project-sanding.jpg</image:loc>
+      <image:title>Dustless Sanding and Refinishing in New York Brownstones</image:title>
+    </image:image>
+  </url>
+
+  <!-- New Jersey Service Area -->
+  <url>
+    <loc>https://aawoodfloorsinc.com/locations/new-jersey/</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://aawoodfloorsinc.com/locations/new-jersey/" />
+    <image:image>
+      <image:loc>https://aawoodfloorsinc.com/assets/project-lvp.jpg</image:loc>
+      <image:title>Luxury Vinyl Plank and Hardwood in New Jersey</image:title>
+    </image:image>
+  </url>
+
+  <!-- Connecticut Service Area -->
+  <url>
+    <loc>https://aawoodfloorsinc.com/locations/connecticut/</loc>
+    <lastmod>2026-11-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://aawoodfloorsinc.com/locations/connecticut/" />
+    <image:image>
+      <image:loc>https://aawoodfloorsinc.com/assets/project-hardwood.jpg</image:loc>
+      <image:title>Hardwood Flooring Installation in Connecticut and Fairfield County</image:title>
+    </image:image>
+  </url>
+
+</urlset>
