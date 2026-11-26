@@ -119,6 +119,13 @@ nav .w {
   font-size: 21px;
   letter-spacing: 0.5px;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+.logo img {
+  height: 48px;
+  width: auto;
+  display: block;
 }
 .logo b {
   color: var(--red);

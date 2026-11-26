@@ -112,10 +112,20 @@ document.addEventListener('DOMContentLoaded', function () {
       const priceText = outDisplay ? outDisplay.textContent : '';
 
       const areaInput = document.getElementById('ar');
+      const serviceSelect = document.getElementById('cs');
       const notesTextarea = document.getElementById('nt');
       const formEl = document.getElementById('f');
 
       if (areaInput) areaInput.value = sqft;
+      if (serviceSelect) {
+        const firstWord = svcName.split(' ')[0].toLowerCase();
+        for (let i = 0; i < serviceSelect.options.length; i++) {
+          if (serviceSelect.options[i].text.toLowerCase().includes(firstWord)) {
+            serviceSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
       if (notesTextarea) {
         const estSummary = `[Preliminary Estimate] Selected Service: ${svcName} | Size: ${sqft} sq ft | Projected Investment: ${priceText}\n`;
         if (!notesTextarea.value.includes('[Preliminary Estimate]')) {
